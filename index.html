@@ -11,7 +11,7 @@
         const FPS = 30; // frames per second
         const FRICTION = 0.7; // friction coefficient of space (0 = no friction, 1 = lots of friction)
         const ROIDS_JAG = 0.4; // jaggedness of the asteroids (0 = none, 1 = lots)
-        const ROIDS_NUM = 3; // starting number of asteroids
+        const ROIDS_NUM = 10; // starting number of asteroids
         const ROIDS_SIZE = 100; // starting size of asteroids in pixels
         const ROIDS_SPD = 50; // max starting speed of asteroids in pixels per second
         const ROIDS_VERT = 10; // average number of vertices on each asteroids
@@ -170,7 +170,7 @@
             // draw the asteroids
             ctx.strokeStyle = "slategrey";
             ctx.lineWidth = SHIP_SIZE / 20;
-            var x, y, r, a, vert;
+            var x, y, r, a, vert, offs;
             for (var i = 0; i < roids.length; i++) {
 
                 // get the asteroid properties
@@ -179,27 +179,40 @@
                 r = roids[i].r;
                 a = roids[i].a;
                 vert = roids[i].vert;
+                offs = roids[i].offs;
                 
                 // draw a path
                 ctx.beginPath();
                 ctx.moveTo(
-                    x + r * Math.cos(a),
-                    y + r * Math.sin(a)
+                    x + r * offs[i] * Math.cos(a),
+                    y + r * offs[i] * Math.sin(a)
                 );
 
                 // draw the polygon
-                for (var j = 0; j < vert; j++) {
+                for (var j = 1; j < vert; j++) {
                     ctx.lineTo(
-                        x + r * Math.cos(a + j * Math.PI * 2 / vert),
-                        y + r * Math.sin(a + j * Math.PI * 2 / vert)
+                        x + r * offs[j] * Math.cos(a + j * Math.PI * 2 / vert),
+                        y + r * offs[j] * Math.sin(a + j * Math.PI * 2 / vert)
                     )
                 }
                 ctx.closePath();
                 ctx.stroke();
 
                 // move the asteroid
+                roids[i].x += roids[i].xv;
+                roids[i].y -= roids[i].yv;
 
                 // handle edge of screen
+                if (roids[i].x < 0 - roids[i].r) {
+                    roids[i].x = canv.width + roids[i].r;
+                } else if (roids[i].x > canv.width + roids[i].r) {
+                    roids[i].x = 0 - roids[i].r;
+                }
+                if (roids[i].y < 0 - roids[i].r) {
+                    roids[i].y = canv.height + roids[i].r;
+                } else if (roids[i].y > canv.height + roids[i].r) {
+                    roids[i].y = 0 - roids[i].r;
+                }
             }
 
             // rotate ship
